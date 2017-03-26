@@ -64,3 +64,17 @@ func (source *Source) createFlowerIfExists(containerId string) *Flower {
 
 	return nil
 }
+
+func (source *Source) getFlower(containerIdOrName string) *Flower {
+	flower := source.flowers[containerIdOrName]
+	// alright, no flower found by container id, let's find it by container name
+	if flower == nil {
+		for _, flower := range source.flowers {
+			if flower.containerName == containerIdOrName {
+				return flower
+			}
+		}
+	}
+
+	return flower
+}
