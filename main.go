@@ -6,7 +6,7 @@ func main() {
 	source := NewSource()
 	source.findFlowers()
 
-	for _, flower := range source.flowers {
+	for _, flower := range source.flowersById {
 		fmt.Printf(flower.path)
 	}
 }

@@ -7,8 +7,9 @@ import (
 )
 
 type Source struct {
-	client 	*docker.Client
-	flowers map[string]*Flower
+	client      	*docker.Client
+	flowersById 	map[string]*Flower
+	flowersByName	map[string]*Flower
 }
 
 func NewSource() *Source {
@@ -27,8 +28,9 @@ func NewSource() *Source {
 }
 
 func (source *Source) findFlowers() {
-	// initializes Flowers mapped by container id
-	source.flowers = make(map[string]*Flower)
+	// initializes Flowers maps
+	source.flowersById = make(map[string]*Flower)
+	source.flowersByName = make(map[string]*Flower)
 
 	// lists all running containers
 	opts := docker.ListContainersOptions{All: true}
@@ -41,7 +43,8 @@ func (source *Source) findFlowers() {
 	for _, containerInfo := range containersInfo {
 		flower := source.createFlowerIfExists(containerInfo.ID)
 		if flower != nil {
-			source.flowers[containerInfo.ID] = flower
+			source.flowersById[flower.containerId] = flower
+			source.flowersByName[flower.containerName] = flower
 		}
 	}
 }
@@ -57,7 +60,7 @@ func (source *Source) createFlowerIfExists(containerId string) *Flower {
 		envVariableParts := strings.Split(envVariable, "=")
 		if envVariableParts[0] == "FLOWER_PATH" {
 			// yaa! FLOWER_PATH found, let's create a Flower!
-			flower := NewFlower(containerId, container.Name, envVariableParts[1])
+			flower := NewFlower(container.ID, container.Name, envVariableParts[1])
 			return flower
 		}
 	}
@@ -66,14 +69,10 @@ func (source *Source) createFlowerIfExists(containerId string) *Flower {
 }
 
 func (source *Source) getFlower(containerIdOrName string) *Flower {
-	flower := source.flowers[containerIdOrName]
+	flower := source.flowersById[containerIdOrName]
 	// alright, no flower found by container id, let's find it by container name
 	if flower == nil {
-		for _, flower := range source.flowers {
-			if flower.containerName == containerIdOrName {
-				return flower
-			}
-		}
+		return source.flowersByName[containerIdOrName]
 	}
 
 	return flower
