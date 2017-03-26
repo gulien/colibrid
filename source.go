@@ -57,7 +57,7 @@ func (source *Source) createFlowerIfExists(containerId string) *Flower {
 		envVariableParts := strings.Split(envVariable, "=")
 		if envVariableParts[0] == "FLOWER_PATH" {
 			// yaa! FLOWER_PATH found, let's create a Flower!
-			flower := NewFlower(containerId, envVariableParts[1])
+			flower := NewFlower(containerId, container.Name, envVariableParts[1])
 			return flower
 		}
 	}
