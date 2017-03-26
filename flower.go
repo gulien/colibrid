@@ -1,14 +1,14 @@
 package main
 
 type Flower struct {
-	containerId 	string
-	flowerPath 	string
+	containerId string
+	path        string
 }
 
-func NewFlower(containerId string, flowerPath string) *Flower {
+func NewFlower(containerId string, path string) *Flower {
 	flower := &Flower {
-		containerId: 	containerId,
-		flowerPath:	flowerPath,
+		containerId: containerId,
+		path:        path,
 	}
 
 	return flower

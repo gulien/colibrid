@@ -7,6 +7,6 @@ func main() {
 	source.findFlowers()
 
 	for _, flower := range source.flowers {
-		fmt.Printf(flower.flowerPath)
+		fmt.Printf(flower.path)
 	}
 }
