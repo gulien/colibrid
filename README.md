@@ -3,7 +3,11 @@
 </div>
 
 <h1 align="center">colibrid</h1>
+
 <div align="center">
-    [![Go Report Card](https://goreportcard.com/badge/github.com/gulien/colibrid)](https://goreportcard.com/report/github.com/gulien/colibrid
+    <a href="https://goreportcard.com/report/github.com/gulien/colibrid">
+        <img src="https://goreportcard.com/badge/github.com/gulien/colibrid" alt="Go Report Card"  />
+    </a>
 </div>
+
 <br>
