@@ -5,8 +5,8 @@ import (
 )
 
 type Colibri struct {
-	Client 	*docker.Client
-	Cache 	map[string]*Flower
+	Client *docker.Client
+	Cache  map[string]*Flower
 }
 
 func NewColibri() *Colibri {
@@ -16,7 +16,7 @@ func NewColibri() *Colibri {
 	}
 
 	return &Colibri{
-		Client:	client,
+		Client: client,
 	}
 }
 

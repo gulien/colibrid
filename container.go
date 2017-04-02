@@ -10,18 +10,18 @@ import (
 )
 
 type Container struct {
-	Client 	*docker.Client
-	ID	string
-	ShortID	string
-	Name 	string
-	Env 	[]string
+	Client  *docker.Client
+	ID      string
+	ShortID string
+	Name    string
+	Env     []string
 }
 
 func NewContainer(client *docker.Client, id string) *Container {
 	container := &Container{
-		Client:		client,
-		ID:		id,
-		ShortID: 	id[:12],
+		Client:  client,
+		ID:      id,
+		ShortID: id[:12],
 	}
 
 	inspected, err := client.InspectContainer(container.ID)
@@ -41,21 +41,21 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 
 	if capture {
 		createExecOptions = docker.CreateExecOptions{
-			AttachStdin: 	false,
-			AttachStdout:	true,
-			AttachStderr: 	false,
-			Tty:		false,
-			Cmd:		command,
-			Container:	container.ID,
+			AttachStdin:  false,
+			AttachStdout: true,
+			AttachStderr: false,
+			Tty:          false,
+			Cmd:          command,
+			Container:    container.ID,
 		}
 	} else {
 		createExecOptions = docker.CreateExecOptions{
-			AttachStdin: 	true,
-			AttachStdout:	true,
-			AttachStderr: 	true,
-			Tty:		true,
-			Cmd:		command,
-			Container:	container.ID,
+			AttachStdin:  true,
+			AttachStdout: true,
+			AttachStderr: true,
+			Tty:          true,
+			Cmd:          command,
+			Container:    container.ID,
 		}
 	}
 
@@ -85,13 +85,13 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 		}()
 
 		writer.Close()
-		captured = <- commandOutput
+		captured = <-commandOutput
 	} else {
 		startExecOptions := docker.StartExecOptions{
-			InputStream: 	os.Stdin,
-			OutputStream: 	os.Stdout,
-			ErrorStream: 	os.Stderr,
-			RawTerminal: 	true,
+			InputStream:  os.Stdin,
+			OutputStream: os.Stdout,
+			ErrorStream:  os.Stderr,
+			RawTerminal:  true,
 		}
 
 		err = container.Client.StartExec(exec.ID, startExecOptions)

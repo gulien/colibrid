@@ -5,26 +5,26 @@ import (
 )
 
 type Flower struct {
-	Container 	*Container
-	Path		string
+	Container *Container
+	Path      string
 }
 
 type FlowerData struct {
-	Version 	string `yaml:"version,omitempty"`
-	Commands 	[]struct {
-		Name 	string `yaml:"name"`
-		Bin	string `yaml:"bin"`
-		Context	string `yaml:"context,omitempty"`
-		User 	string `yaml:"user,omitempty"`
-		Usage 	string `yaml:"usage,omitempty"`
-		Help 	string `yaml:"help,omitempty"`
+	Version  string `yaml:"version,omitempty"`
+	Commands []struct {
+		Name    string `yaml:"name"`
+		Bin     string `yaml:"bin"`
+		Context string `yaml:"context,omitempty"`
+		User    string `yaml:"user,omitempty"`
+		Usage   string `yaml:"usage,omitempty"`
+		Help    string `yaml:"help,omitempty"`
 	} `yaml:"commands"`
 }
 
 func NewFlower(container *Container, path string) *Flower {
 	return &Flower{
-		Container: 	container,
-		Path:		path,
+		Container: container,
+		Path:      path,
 	}
 }
 
