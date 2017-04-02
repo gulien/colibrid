@@ -1,0 +1,8 @@
+version: "1"
+commands:
+  - name: "npm"
+    bin: "npm"
+    context: "/"
+    user: "root"
+    usage: "npm"
+    help: "run npm"

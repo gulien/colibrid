@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+
+  flower_1:
+    image: node:6-alpine
+    #container_name: alpine_flower
+    tty: true
+    environment:
+      - FLOWER_PATH=/flower1.yml
+    volumes:
+      - ./flower1.yml:/flower1.yml:ro
+
+  flower_2:
+    image: node:6-alpine
+    tty: true
+    #environment:
+      #- COLIBRID_FLOWER_PATH=/my/path/to/flower2.yml
+
+  not_a_flower:
+    image: node:6-alpine
+    tty: true
