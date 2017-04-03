@@ -11,7 +11,7 @@ import (
 
 // Container struct represents a Docker's container.
 type Container struct {
-	Client  *docker.Client
+	client  *docker.Client
 	ID      string
 	ShortID string
 	Name    string
@@ -21,7 +21,7 @@ type Container struct {
 // NewContainer function instantiates a Container.
 func NewContainer(client *docker.Client, id string) *Container {
 	container := &Container{
-		Client:  client,
+		client:  client,
 		ID:      id,
 		ShortID: id[:12],
 	}
@@ -63,7 +63,7 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 		}
 	}
 
-	exec, err := container.Client.CreateExec(createExecOptions)
+	exec, err := container.client.CreateExec(createExecOptions)
 	if err != nil {
 		return captured, err
 	}
@@ -76,7 +76,7 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 			RawTerminal:  false,
 		}
 
-		err = container.Client.StartExec(exec.ID, startExecOptions)
+		err = container.client.StartExec(exec.ID, startExecOptions)
 		if err != nil {
 			return captured, err
 		}
@@ -98,7 +98,7 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 			RawTerminal:  true,
 		}
 
-		err = container.Client.StartExec(exec.ID, startExecOptions)
+		err = container.client.StartExec(exec.ID, startExecOptions)
 		if err != nil {
 			return captured, err
 		}

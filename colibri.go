@@ -7,8 +7,8 @@ import (
 // Colibri struct helps for discovering
 // and caching Flowers.
 type Colibri struct {
-	Client *docker.Client
-	Cache  map[string]*Flower
+	client *docker.Client
+	cache  map[string]*Flower
 }
 
 // NewColibri function instantiates a Colibri.
@@ -19,7 +19,7 @@ func NewColibri() *Colibri {
 	}
 
 	return &Colibri{
-		Client: client,
+		client: client,
 	}
 }
 
@@ -28,7 +28,7 @@ func NewColibri() *Colibri {
 func (colibri *Colibri) Discover() {
 	// lists all running containers
 	opts := docker.ListContainersOptions{All: true}
-	containersInfo, err := colibri.Client.ListContainers(opts)
+	containersInfo, err := colibri.client.ListContainers(opts)
 	if err != nil {
 		panic(err)
 	}
@@ -36,26 +36,26 @@ func (colibri *Colibri) Discover() {
 	// finds Flowers among running containers
 	tmpCache := make(map[string]*Flower)
 	for _, containerInfo := range containersInfo {
-		switch colibri.Cache[containerInfo.ID] {
+		switch colibri.cache[containerInfo.ID] {
 		case nil:
-			container := NewContainer(colibri.Client, containerInfo.ID)
+			container := NewContainer(colibri.client, containerInfo.ID)
 			path := container.GetEnvValue("FLOWER_PATH")
 			if path != "" {
 				tmpCache[containerInfo.ID] = NewFlower(container, path)
 			}
 		default:
-			tmpCache[containerInfo.ID] = colibri.Cache[containerInfo.ID]
+			tmpCache[containerInfo.ID] = colibri.cache[containerInfo.ID]
 		}
 	}
 
 	// refreshes the cache
-	colibri.Cache = tmpCache
+	colibri.cache = tmpCache
 }
 
 // GetFlower function returns a Flower by its short id or name.
 // If there is no corresponding Flower in its cache, returns nil.
 func (colibri *Colibri) GetFlower(identifier string) *Flower {
-	for _, flower := range colibri.Cache {
+	for _, flower := range colibri.cache {
 		if flower.Container.ShortID == identifier || flower.Container.Name == identifier {
 			return flower
 		}
@@ -67,16 +67,16 @@ func (colibri *Colibri) GetFlower(identifier string) *Flower {
 // ListIdentifiers function returns the list of containers' short ids
 // and names from its cache.
 func (colibri *Colibri) ListIdentifiers() []string {
-	return append(colibri.ListNames(), colibri.ListShortIDs()...)
+	return append(colibri.listNames(), colibri.listShortIDs()...)
 }
 
-// ListShortIDs function returns the list of containers' short ids
+// listShortIDs function returns the list of containers' short ids
 // from its cache.
-func (colibri *Colibri) ListShortIDs() []string {
-	shortIDs := make([]string, len(colibri.Cache))
+func (colibri *Colibri) listShortIDs() []string {
+	shortIDs := make([]string, len(colibri.cache))
 
 	i := 0
-	for _, flower := range colibri.Cache {
+	for _, flower := range colibri.cache {
 		shortIDs[i] = flower.Container.ShortID
 		i++
 	}
@@ -84,13 +84,13 @@ func (colibri *Colibri) ListShortIDs() []string {
 	return shortIDs
 }
 
-// ListNames function returns the list of containers' names
+// listNames function returns the list of containers' names
 // from its cache.
-func (colibri *Colibri) ListNames() []string {
-	names := make([]string, len(colibri.Cache))
+func (colibri *Colibri) listNames() []string {
+	names := make([]string, len(colibri.cache))
 
 	i := 0
-	for _, flower := range colibri.Cache {
+	for _, flower := range colibri.cache {
 		names[i] = flower.Container.Name
 		i++
 	}
