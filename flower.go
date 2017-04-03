@@ -47,14 +47,12 @@ func NewFlower(container *Container, path string) *Flower {
 // which path has been defined in the FLOWER_PATH
 // container's environment variable.
 func (flower *Flower) Parse() (*FlowerData, error) {
-	flowerData := &FlowerData{}
-
 	command := []string{"cat", flower.Path}
 	captured, err := flower.Container.Exec(command, true)
 	if err != nil {
 		return nil, err
 	}
-
+	flowerData := &FlowerData{}
 	err = yaml.Unmarshal([]byte(captured), flowerData)
 	if err != nil {
 		return nil, err
