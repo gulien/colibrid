@@ -54,6 +54,7 @@ func (flower *Flower) Parse() (*FlowerData, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	flowerData := &FlowerData{}
 	err = yaml.Unmarshal([]byte(captured), flowerData)
 	if err != nil {
