@@ -4,36 +4,38 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Flower struct represents a container which is exposing commands.
-type Flower struct {
-	Container *Container
-	Path      string
-}
+type (
+	// Flower struct represents a container which is exposing commands.
+	Flower struct {
+		Container *Container
+		Path      string
+	}
 
-// FlowerData struct represents a YAML file defining commands.
-type FlowerData struct {
-	Commands []CommandData `yaml:"commands"`
-}
+	// FlowerData struct represents a YAML file defining commands.
+	FlowerData struct {
+		Commands []CommandData `yaml:"commands"`
+	}
 
-// CommandData struct represents a section in the YAML file defining a command.
-type CommandData struct {
-	Name    string           `yaml:"name"`
-	Bin     string           `yaml:"bin"`
-	Context string           `yaml:"context,omitempty"`
-	User    string           `yaml:"user,omitempty"`
-	Usage   string           `yaml:"usage,omitempty"`
-	Help    string           `yaml:"help,omitempty"`
-	Sub     []CommandSubData `yaml:"sub,omitempty"`
-}
+	// CommandData struct represents a section in the YAML file defining a command.
+	CommandData struct {
+		Name    string           `yaml:"name"`
+		Bin     string           `yaml:"bin"`
+		Context string           `yaml:"context,omitempty"`
+		User    string           `yaml:"user,omitempty"`
+		Usage   string           `yaml:"usage,omitempty"`
+		Help    string           `yaml:"help,omitempty"`
+		Sub     []CommandSubData `yaml:"sub,omitempty"`
+	}
 
-// CommandSubData struct represents a section in the YAML file defining
-// option/value/sub-command of a command or another option/value/sub-command.
-type CommandSubData struct {
-	Name  string           `yaml:"name"`
-	Usage string           `yaml:"usage,omitempty"`
-	Help  string           `yaml:"help,omitempty"`
-	Sub   []CommandSubData `yaml:"sub,omitempty"`
-}
+	// CommandSubData struct represents a section in the YAML file defining
+	// option/value/sub-command of a command or another option/value/sub-command.
+	CommandSubData struct {
+		Name  string           `yaml:"name"`
+		Usage string           `yaml:"usage,omitempty"`
+		Help  string           `yaml:"help,omitempty"`
+		Sub   []CommandSubData `yaml:"sub,omitempty"`
+	}
+)
 
 // NewFlower function instantiates a Flower.
 func NewFlower(container *Container, path string) *Flower {
