@@ -4,7 +4,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-// Colibri is a kind of supervisor for discovering
+// Colibri struct helps for discovering
 // and caching Flowers.
 type Colibri struct {
 	Client *docker.Client
@@ -62,6 +62,12 @@ func (colibri *Colibri) GetFlower(identifier string) *Flower {
 	}
 
 	return nil
+}
+
+// ListIdentifiers function returns the list of containers' short ids
+// and names from its cache.
+func (colibri *Colibri) ListIdentifiers() []string {
+	return append(colibri.ListNames(), colibri.ListShortIDs()...)
 }
 
 // ListShortIDs function returns the list of containers' short ids

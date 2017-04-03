@@ -9,7 +9,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-// Container represents a Docker's container.
+// Container struct represents a Docker's container.
 type Container struct {
 	Client  *docker.Client
 	ID      string

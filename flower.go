@@ -4,18 +4,18 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Flower represents a container which is exposing commands.
+// Flower struct represents a container which is exposing commands.
 type Flower struct {
 	Container *Container
 	Path      string
 }
 
-// FlowerData represents a YAML file defining commands.
+// FlowerData struct represents a YAML file defining commands.
 type FlowerData struct {
 	Commands []CommandData `yaml:"commands"`
 }
 
-// CommandData represents a section in the YAML file defining a command.
+// CommandData struct represents a section in the YAML file defining a command.
 type CommandData struct {
 	Name    string           `yaml:"name"`
 	Bin     string           `yaml:"bin"`
@@ -26,7 +26,7 @@ type CommandData struct {
 	Sub     []CommandSubData `yaml:"sub,omitempty"`
 }
 
-// CommandSubData represents a section in the YAML file defining
+// CommandSubData struct represents a section in the YAML file defining
 // option/value/sub-command of a command or another option/value/sub-command.
 type CommandSubData struct {
 	Name  string           `yaml:"name"`
