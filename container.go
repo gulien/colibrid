@@ -41,8 +41,8 @@ func NewContainer(client *docker.Client, id string) *Container {
 // If capture parameter is set to true, it sends the output of the command into a string.
 func (container *Container) Exec(command []string, capture bool) (string, error) {
 	captured := ""
-	var createExecOptions docker.CreateExecOptions
 
+	var createExecOptions docker.CreateExecOptions
 	if capture {
 		createExecOptions = docker.CreateExecOptions{
 			AttachStdin:  false,
