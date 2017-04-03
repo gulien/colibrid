@@ -4,11 +4,14 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
+// Colibri is a kind of supervisor for discovering
+// and caching Flowers.
 type Colibri struct {
 	Client *docker.Client
 	Cache  map[string]*Flower
 }
 
+// NewColibri function instantiates a Colibri.
 func NewColibri() *Colibri {
 	client, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -20,7 +23,9 @@ func NewColibri() *Colibri {
 	}
 }
 
-func (colibri *Colibri) Refresh() {
+// Discover function finds running containers which are exposing commands
+// and populates its cache.
+func (colibri *Colibri) Discover() {
 	// lists all running containers
 	opts := docker.ListContainersOptions{All: true}
 	containersInfo, err := colibri.Client.ListContainers(opts)
@@ -38,7 +43,6 @@ func (colibri *Colibri) Refresh() {
 			if path != "" {
 				tmpCache[containerInfo.ID] = NewFlower(container, path)
 			}
-			break
 		default:
 			tmpCache[containerInfo.ID] = colibri.Cache[containerInfo.ID]
 		}
@@ -48,6 +52,8 @@ func (colibri *Colibri) Refresh() {
 	colibri.Cache = tmpCache
 }
 
+// GetFlower function returns a Flower by its short id or name.
+// If there is no corresponding Flower in its cache, returns nil.
 func (colibri *Colibri) GetFlower(identifier string) *Flower {
 	for _, flower := range colibri.Cache {
 		if flower.Container.ShortID == identifier || flower.Container.Name == identifier {
@@ -58,18 +64,8 @@ func (colibri *Colibri) GetFlower(identifier string) *Flower {
 	return nil
 }
 
-func (colibri *Colibri) ListNames() []string {
-	names := make([]string, len(colibri.Cache))
-
-	i := 0
-	for _, flower := range colibri.Cache {
-		names[i] = flower.Container.Name
-		i++
-	}
-
-	return names
-}
-
+// ListShortIDs function returns the list of containers' short ids
+// from its cache.
 func (colibri *Colibri) ListShortIDs() []string {
 	shortIDs := make([]string, len(colibri.Cache))
 
@@ -80,4 +76,18 @@ func (colibri *Colibri) ListShortIDs() []string {
 	}
 
 	return shortIDs
+}
+
+// ListNames function returns the list of containers' names
+// from its cache.
+func (colibri *Colibri) ListNames() []string {
+	names := make([]string, len(colibri.Cache))
+
+	i := 0
+	for _, flower := range colibri.Cache {
+		names[i] = flower.Container.Name
+		i++
+	}
+
+	return names
 }

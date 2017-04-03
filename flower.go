@@ -4,23 +4,38 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Flower represents a container which is exposing commands.
 type Flower struct {
 	Container *Container
 	Path      string
 }
 
+// FlowerData represents a YAML file defining commands.
 type FlowerData struct {
-	Version  string `yaml:"version,omitempty"`
-	Commands []struct {
-		Name    string `yaml:"name"`
-		Bin     string `yaml:"bin"`
-		Context string `yaml:"context,omitempty"`
-		User    string `yaml:"user,omitempty"`
-		Usage   string `yaml:"usage,omitempty"`
-		Help    string `yaml:"help,omitempty"`
-	} `yaml:"commands"`
+	Commands []CommandData `yaml:"commands"`
 }
 
+// CommandData represents a section in the YAML file defining a command.
+type CommandData struct {
+	Name    string           `yaml:"name"`
+	Bin     string           `yaml:"bin"`
+	Context string           `yaml:"context,omitempty"`
+	User    string           `yaml:"user,omitempty"`
+	Usage   string           `yaml:"usage,omitempty"`
+	Help    string           `yaml:"help,omitempty"`
+	Sub     []CommandSubData `yaml:"sub,omitempty"`
+}
+
+// CommandSubData represents a section in the YAML file defining
+// option/value/sub-command of a command or another option/value/sub-command.
+type CommandSubData struct {
+	Name  string           `yaml:"name"`
+	Usage string           `yaml:"usage,omitempty"`
+	Help  string           `yaml:"help,omitempty"`
+	Sub   []CommandSubData `yaml:"sub,omitempty"`
+}
+
+// NewFlower function instantiates a Flower.
 func NewFlower(container *Container, path string) *Flower {
 	return &Flower{
 		Container: container,
@@ -28,6 +43,9 @@ func NewFlower(container *Container, path string) *Flower {
 	}
 }
 
+// Parse function retrieves data contained in a YAML file
+// which path has been defined by the FLOWER_PATH
+// container's environment variable.
 func (flower *Flower) Parse() (*FlowerData, error) {
 	flowerData := &FlowerData{}
 

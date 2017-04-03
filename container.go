@@ -9,6 +9,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
+// Container represents a Docker's container.
 type Container struct {
 	Client  *docker.Client
 	ID      string
@@ -17,6 +18,7 @@ type Container struct {
 	Env     []string
 }
 
+// NewContainer function instantiates a Container.
 func NewContainer(client *docker.Client, id string) *Container {
 	container := &Container{
 		Client:  client,
@@ -35,6 +37,8 @@ func NewContainer(client *docker.Client, id string) *Container {
 	return container
 }
 
+// Exec function runs a command from current Container instance.
+// If capture parameter is set to true, it sends the output of the command into a string.
 func (container *Container) Exec(command []string, capture bool) (string, error) {
 	captured := ""
 	var createExecOptions docker.CreateExecOptions
@@ -103,6 +107,9 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 	return captured, nil
 }
 
+// GetEnvValue function retrieves the value of an environment variable of
+// the current Container instance. If no environment variable found,
+// returns an empty string.
 func (container *Container) GetEnvValue(keyName string) string {
 	for _, envStr := range container.Env {
 		envStrParts := strings.SplitN(envStr, "=", 2)
