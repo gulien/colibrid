@@ -13,27 +13,27 @@ type (
 
 	// FlowerData struct represents a YAML file defining commands.
 	FlowerData struct {
-		Commands []CommandData `yaml:"commands"`
+		Commands []FlowerCommandData `yaml:"commands"`
 	}
 
-	// CommandData struct represents a section in the YAML file defining a command.
-	CommandData struct {
-		Name    string           `yaml:"name"`
-		Bin     string           `yaml:"bin"`
-		Context string           `yaml:"context,omitempty"`
-		User    string           `yaml:"user,omitempty"`
-		Usage   string           `yaml:"usage,omitempty"`
-		Help    string           `yaml:"help,omitempty"`
-		Sub     []CommandSubData `yaml:"sub,omitempty"`
+	// FlowerCommandData struct represents a section in the YAML file defining a command.
+	FlowerCommandData struct {
+		Name    string                 `yaml:"name"`
+		Bin     string                 `yaml:"bin"`
+		Context string                 `yaml:"context,omitempty"`
+		User    string                 `yaml:"user,omitempty"`
+		Usage   string                 `yaml:"usage,omitempty"`
+		Help    string                 `yaml:"help,omitempty"`
+		Sub     []FlowerCommandSubData `yaml:"sub,omitempty"`
 	}
 
-	// CommandSubData struct represents a section in the YAML file defining
+	// FlowerCommandSubData struct represents a section in the YAML file defining
 	// option/value/sub-command of a command or another option/value/sub-command.
-	CommandSubData struct {
-		Name  string           `yaml:"name"`
-		Usage string           `yaml:"usage,omitempty"`
-		Help  string           `yaml:"help,omitempty"`
-		Sub   []CommandSubData `yaml:"sub,omitempty"`
+	FlowerCommandSubData struct {
+		Name  string                 `yaml:"name"`
+		Usage string                 `yaml:"usage,omitempty"`
+		Help  string                 `yaml:"help,omitempty"`
+		Sub   []FlowerCommandSubData `yaml:"sub,omitempty"`
 	}
 )
 
