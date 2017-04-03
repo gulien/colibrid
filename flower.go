@@ -44,7 +44,7 @@ func NewFlower(container *Container, path string) *Flower {
 }
 
 // Parse function retrieves data contained in a YAML file
-// which path has been defined by the FLOWER_PATH
+// which path has been defined in the FLOWER_PATH
 // container's environment variable.
 func (flower *Flower) Parse() (*FlowerData, error) {
 	flowerData := &FlowerData{}
