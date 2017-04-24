@@ -39,7 +39,7 @@ func NewContainer(client *docker.Client, id string) *Container {
 
 // Exec function runs a command from current Container instance.
 // If capture parameter is set to true, it sends the output of the command into a string.
-func (container *Container) Exec(command []string, capture bool) (string, error) {
+func (container *Container) Exec(command []string, capture bool, user string) (string, error) {
 	captured := ""
 
 	var createExecOptions docker.CreateExecOptions
@@ -51,6 +51,7 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 			Tty:          false,
 			Cmd:          command,
 			Container:    container.ID,
+			User:         user,
 		}
 	} else {
 		createExecOptions = docker.CreateExecOptions{
@@ -60,6 +61,7 @@ func (container *Container) Exec(command []string, capture bool) (string, error)
 			Tty:          true,
 			Cmd:          command,
 			Container:    container.ID,
+			User:         user,
 		}
 	}
 

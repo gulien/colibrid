@@ -1,14 +1,17 @@
 package main
 
 import (
+	"errors"
+
 	"github.com/fsouza/go-dockerclient"
 )
 
 // Colibri struct helps for discovering
 // and caching Flowers.
 type Colibri struct {
-	client *docker.Client
-	cache  map[string]*Flower
+	client        *docker.Client
+	cache         map[string]*Flower
+	CurrentFlower *Flower
 }
 
 // NewColibri function instantiates a Colibri.
@@ -24,8 +27,8 @@ func NewColibri() *Colibri {
 }
 
 // Discover function finds running containers which are exposing commands
-// and populates its cache.
-func (colibri *Colibri) Discover() {
+// and populates its cache. Returns the number of these containers.
+func (colibri *Colibri) Discover() int {
 	// lists all running containers
 	opts := docker.ListContainersOptions{All: true}
 	containersInfo, err := colibri.client.ListContainers(opts)
@@ -50,6 +53,26 @@ func (colibri *Colibri) Discover() {
 
 	// refreshes the cache
 	colibri.cache = tmpCache
+
+	return len(colibri.cache)
+}
+
+// FlyTo function is a wrapper of GetFlower function and Flower's Parse
+// function. It also populates the CurrentFlower variable of the Colibri
+// instance.
+func (colibri *Colibri) FlyTo(identifier string) (*FlowerData, error) {
+	colibri.CurrentFlower = colibri.GetFlower(identifier)
+
+	if colibri.CurrentFlower == nil {
+		return nil, errors.New("Unknown container: is it a flower?")
+	}
+
+	flowerData, err := colibri.CurrentFlower.Parse()
+	if err != nil {
+		return flowerData, err
+	}
+
+	return flowerData, nil
 }
 
 // GetFlower function returns a Flower by its short id or name.
@@ -67,12 +90,12 @@ func (colibri *Colibri) GetFlower(identifier string) *Flower {
 // ListIdentifiers function returns the list of containers' short ids
 // and names from its cache.
 func (colibri *Colibri) ListIdentifiers() []string {
-	return append(colibri.listNames(), colibri.listShortIDs()...)
+	return append(colibri.ListNames(), colibri.ListShortIDs()...)
 }
 
-// listShortIDs function returns the list of containers' short ids
+// ListShortIDs function returns the list of containers' short ids
 // from its cache.
-func (colibri *Colibri) listShortIDs() []string {
+func (colibri *Colibri) ListShortIDs() []string {
 	shortIDs := make([]string, len(colibri.cache))
 
 	i := 0
@@ -84,9 +107,9 @@ func (colibri *Colibri) listShortIDs() []string {
 	return shortIDs
 }
 
-// listNames function returns the list of containers' names
+// ListNames function returns the list of containers' names
 // from its cache.
-func (colibri *Colibri) listNames() []string {
+func (colibri *Colibri) ListNames() []string {
 	names := make([]string, len(colibri.cache))
 
 	i := 0
