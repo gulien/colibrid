@@ -16,25 +16,25 @@ type (
 
 	// FlowerData struct represents a YAML file defining commands.
 	FlowerData struct {
-		Commands []*FlowerCommandData `yaml:"commands"`
+		Commands []*FlowerCommandData `yaml:"Commands"`
 	}
 
 	// FlowerCommandData struct represents a section in the YAML file defining a command.
 	FlowerCommandData struct {
-		Name    string                  `yaml:"name"`
-		Bin     string                  `yaml:"bin"`
-		Context string                  `yaml:"context,omitempty"`
-		User    string                  `yaml:"user,omitempty"`
-		Usage   string                  `yaml:"usage,omitempty"`
-		Help    string                  `yaml:"help,omitempty"`
-		Sub     []*FlowerCommandSubData `yaml:"sub,omitempty"`
+		Name              string                  `yaml:"Name"`
+		Usage             string                  `yaml:"Usage,omitempty"`
+		Help              string                  `yaml:"Help,omitempty"`
+		Bin               string                  `yaml:"Bin"`
+		Workdir           string                  `yaml:"Workdir,omitempty"`
+		DockerExecOptions *DockerExecOptions      `yaml:"DockerExecOptions,omitempty"`
+		Sub               []*FlowerCommandSubData `yaml:"Sub,omitempty"`
 	}
 
 	// FlowerCommandSubData struct represents a section in the YAML file defining
 	// option/value/sub-command of a command or another option/value/sub-command.
 	FlowerCommandSubData struct {
-		Name string                  `yaml:"name"`
-		Sub  []*FlowerCommandSubData `yaml:"sub,omitempty"`
+		Name string                  `yaml:"Name"`
+		Sub  []*FlowerCommandSubData `yaml:"Sub,omitempty"`
 	}
 )
 
@@ -46,13 +46,12 @@ func NewFlower(container *Container, path string) *Flower {
 	}
 }
 
-// Parse function retrieves data contained in a YAML file
-// which path has been defined in the FLOWER_PATH
-// container's environment variable. It also populates
-// the FlowerData variable of the Flower instance.
+// Parse function retrieves data contained in a YAML file which path has been defined
+// in the FLOWER_PATH  container's environment variable.
+// It also populates the FlowerData variable of the Flower instance.
 func (flower *Flower) Parse() (*FlowerData, error) {
 	command := []string{"cat", flower.Path}
-	captured, err := flower.Container.Exec(command, true, "")
+	captured, err := flower.Container.Exec(command, &DockerExecOptions{}, true)
 	if err != nil {
 		return nil, err
 	}
@@ -70,15 +69,15 @@ func (flower *Flower) Parse() (*FlowerData, error) {
 
 // Exec function simply runs an available command from the Flower.
 // If capture parameter is set to true, it sends the output of the command into a string.
-func (flower *Flower) Exec(commandName string, capture bool, args ...string) (string, error) {
+func (flower *Flower) Exec(commandName string, capture bool, args []string) (string, error) {
 	flowerCommandData, err := flower.GetFlowerCommandData(commandName)
 	if err != nil {
 		return "", err
 	}
 
 	var command []string
-	if flowerCommandData.Context != "" {
-		command = append([]string{"cd", flowerCommandData.Context, "&&"})
+	if flowerCommandData.Workdir != "" {
+		command = append([]string{"cd", flowerCommandData.Workdir, "&&"})
 	}
 
 	command = append([]string{flowerCommandData.Bin})
@@ -86,7 +85,14 @@ func (flower *Flower) Exec(commandName string, capture bool, args ...string) (st
 		command = append([]string{arg})
 	}
 
-	return flower.Container.Exec(command, capture, flowerCommandData.User)
+	var dockerExecOptions *DockerExecOptions
+	if flowerCommandData.DockerExecOptions != nil {
+		dockerExecOptions = flowerCommandData.DockerExecOptions
+	} else {
+		dockerExecOptions = &DockerExecOptions{}
+	}
+
+	return flower.Container.Exec(command, dockerExecOptions, capture)
 }
 
 // GetFlowerCommandData returns a FlowerCommandData. If the Flower instance has not

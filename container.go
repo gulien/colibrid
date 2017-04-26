@@ -9,14 +9,23 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-// Container struct represents a Docker's container.
-type Container struct {
-	client  *docker.Client
-	ID      string
-	ShortID string
-	Name    string
-	Env     []string
-}
+type (
+	// Container struct represents a Docker's container.
+	Container struct {
+		client  *docker.Client
+		ID      string
+		ShortID string
+		Name    string
+		Env     []string
+	}
+
+	// DockerExecOptions struct represents some useful Docker
+	// exec command options.
+	DockerExecOptions struct {
+		User       string `yaml:"User,omitempty"`
+		Privileged bool   `yaml:"Privileged,omitempty"`
+	}
+)
 
 // NewContainer function instantiates a Container.
 func NewContainer(client *docker.Client, id string) *Container {
@@ -39,7 +48,7 @@ func NewContainer(client *docker.Client, id string) *Container {
 
 // Exec function runs a command from current Container instance.
 // If capture parameter is set to true, it sends the output of the command into a string.
-func (container *Container) Exec(command []string, capture bool, user string) (string, error) {
+func (container *Container) Exec(command []string, dockerExecOptions *DockerExecOptions, capture bool) (string, error) {
 	captured := ""
 
 	var createExecOptions docker.CreateExecOptions
@@ -51,7 +60,8 @@ func (container *Container) Exec(command []string, capture bool, user string) (s
 			Tty:          false,
 			Cmd:          command,
 			Container:    container.ID,
-			User:         user,
+			User:         dockerExecOptions.User,
+			Privileged:   dockerExecOptions.Privileged,
 		}
 	} else {
 		createExecOptions = docker.CreateExecOptions{
@@ -61,7 +71,8 @@ func (container *Container) Exec(command []string, capture bool, user string) (s
 			Tty:          true,
 			Cmd:          command,
 			Container:    container.ID,
-			User:         user,
+			User:         dockerExecOptions.User,
+			Privileged:   dockerExecOptions.Privileged,
 		}
 	}
 
