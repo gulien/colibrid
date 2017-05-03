@@ -19,8 +19,7 @@ type (
 		Env     []string
 	}
 
-	// DockerExecOptions struct represents some useful Docker
-	// exec command options.
+	// DockerExecOptions struct regroups some Docker exec command options.
 	DockerExecOptions struct {
 		User       string `yaml:"User,omitempty"`
 		Privileged bool   `yaml:"Privileged,omitempty"`
@@ -48,6 +47,7 @@ func NewContainer(client *docker.Client, id string) *Container {
 
 // Exec function runs a command from current Container instance.
 // If capture parameter is set to true, it sends the output of the command into a string.
+// Throws an error if something bad happens.
 func (container *Container) Exec(command []string, dockerExecOptions *DockerExecOptions, capture bool) (string, error) {
 	captured := ""
 
@@ -120,9 +120,8 @@ func (container *Container) Exec(command []string, dockerExecOptions *DockerExec
 	return captured, nil
 }
 
-// GetEnvValue function retrieves the value of an environment variable of
-// the current Container instance. If no environment variable found,
-// returns an empty string.
+// GetEnvValue function retrieves the value of an environment variable of the current Container instance.
+// If no environment variable found, returns an empty string.
 func (container *Container) GetEnvValue(keyName string) string {
 	for _, envStr := range container.Env {
 		envStrParts := strings.SplitN(envStr, "=", 2)

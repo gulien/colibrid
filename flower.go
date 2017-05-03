@@ -46,9 +46,10 @@ func NewFlower(container *Container, path string) *Flower {
 	}
 }
 
-// Parse function retrieves data contained in a YAML file which path has been defined
-// in the FLOWER_PATH  container's environment variable.
+// Parse function retrieves data contained in a YAML file which path has been defined in the FLOWER_PATH
+// container's environment variable.
 // It also populates the FlowerData variable of the Flower instance.
+// This method mights throw the errors encountered while running Container Exec or yaml Unmarshal methods.
 func (flower *Flower) Parse() (*FlowerData, error) {
 	command := []string{"cat", flower.Path}
 	captured, err := flower.Container.Exec(command, &DockerExecOptions{}, true)
@@ -69,6 +70,7 @@ func (flower *Flower) Parse() (*FlowerData, error) {
 
 // Exec function simply runs an available command from the Flower.
 // If capture parameter is set to true, it sends the output of the command into a string.
+// This method might throws the errors encountered while running GetFlowerCommandData or Container Exec methods.
 func (flower *Flower) Exec(commandName string, capture bool, args []string) (string, error) {
 	flowerCommandData, err := flower.GetFlowerCommandData(commandName)
 	if err != nil {
@@ -86,17 +88,18 @@ func (flower *Flower) Exec(commandName string, capture bool, args []string) (str
 	}
 
 	var dockerExecOptions *DockerExecOptions
-	if flowerCommandData.DockerExecOptions != nil {
+	switch flowerCommandData.DockerExecOptions {
+	case nil:
 		dockerExecOptions = flowerCommandData.DockerExecOptions
-	} else {
+	default:
 		dockerExecOptions = &DockerExecOptions{}
 	}
 
 	return flower.Container.Exec(command, dockerExecOptions, capture)
 }
 
-// GetFlowerCommandData returns a FlowerCommandData. If the Flower instance has not
-// been parsed or the command does not exist, throws an error.
+// GetFlowerCommandData returns a FlowerCommandData.
+// If the Flower instance has not been parsed or the command does not exist, throws an error.
 func (flower *Flower) GetFlowerCommandData(commandName string) (*FlowerCommandData, error) {
 	if flower.FlowerData == nil {
 		return nil, errors.New("Flower has not been parsed.")

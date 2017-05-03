@@ -6,8 +6,7 @@ import (
 	"github.com/fsouza/go-dockerclient"
 )
 
-// Colibri struct helps for discovering
-// and caching Flowers.
+// Colibri struct is used for discovering and caching Flowers.
 type Colibri struct {
 	client        *docker.Client
 	cache         map[string]*Flower
@@ -26,8 +25,8 @@ func NewColibri() *Colibri {
 	}
 }
 
-// Discover function finds running containers which are exposing commands
-// and populates its cache. Returns the number of these containers.
+// Discover function finds running containers which are exposing commands and populates its cache.
+// Returns the number of these containers.
 func (colibri *Colibri) Discover() int {
 	// lists all running containers
 	opts := docker.ListContainersOptions{All: true}
@@ -57,26 +56,28 @@ func (colibri *Colibri) Discover() int {
 	return len(colibri.cache)
 }
 
-// FlyTo function is a wrapper of GetFlower function and Flower's Parse
-// function. It also populates the CurrentFlower variable of the Colibri
-// instance.
+// FlyTo function is a wrapper of GetFlower function and Flower's Parse function.
+// It also populates the CurrentFlower variable of the Colibri instance.
+// If there is no corresponding Flower, throws an error.
 func (colibri *Colibri) FlyTo(identifier string) (*FlowerData, error) {
-	colibri.CurrentFlower = colibri.GetFlower(identifier)
+	flower := colibri.GetFlower(identifier)
 
-	if colibri.CurrentFlower == nil {
+	if flower == nil {
 		return nil, errors.New("Unknown container: is it a flower?")
 	}
 
-	flowerData, err := colibri.CurrentFlower.Parse()
+	flowerData, err := flower.Parse()
 	if err != nil {
 		return flowerData, err
 	}
+
+	colibri.CurrentFlower = flower
 
 	return flowerData, nil
 }
 
 // GetFlower function returns a Flower by its short id or name.
-// If there is no corresponding Flower in its cache, returns nil.
+// If there is no corresponding Flower in the cache, returns nil.
 func (colibri *Colibri) GetFlower(identifier string) *Flower {
 	for _, flower := range colibri.cache {
 		if flower.Container.ShortID == identifier || flower.Container.Name == identifier {
@@ -87,14 +88,12 @@ func (colibri *Colibri) GetFlower(identifier string) *Flower {
 	return nil
 }
 
-// ListIdentifiers function returns the list of containers' short ids
-// and names from its cache.
+// ListIdentifiers function returns the list of containers' short ids and names from the cache.
 func (colibri *Colibri) ListIdentifiers() []string {
 	return append(colibri.ListNames(), colibri.ListShortIDs()...)
 }
 
-// ListShortIDs function returns the list of containers' short ids
-// from its cache.
+// ListShortIDs function returns the list of containers' short ids from the cache.
 func (colibri *Colibri) ListShortIDs() []string {
 	shortIDs := make([]string, len(colibri.cache))
 
@@ -107,8 +106,7 @@ func (colibri *Colibri) ListShortIDs() []string {
 	return shortIDs
 }
 
-// ListNames function returns the list of containers' names
-// from its cache.
+// ListNames function returns the list of containers' names from the cache.
 func (colibri *Colibri) ListNames() []string {
 	names := make([]string, len(colibri.cache))
 
